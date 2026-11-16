@@ -9,7 +9,7 @@ local hyprScripts = "$HOME/.config/hypr/hyprland/scripts"
 local qsIpcCall = "qs -c $qsConfig ipc call"
 local qsIsAlive = qsIpcCall .. " TEST_ALIVE"
 
-local searchToggle = hl.dsp.exec_cmd(qsIpcCall .. " search toggle || pkill fuzzel || fuzzel")
+local searchToggle = hl.dsp.exec_cmd(qsIpcCall .. " search appDrawerToggle || pkill fuzzel || fuzzel")
 hl.bind("SUPER + SUPER_L", searchToggle,
     { release = true, description = "Shell: Toggle search" })
 hl.bind("SUPER + SUPER_R", searchToggle, { release = true })

@@ -140,10 +140,10 @@ Scope {
         target: "search"
 
         function toggle() {
-            if (GlobalStates.overviewOpen) {
+            if (GlobalStates.overviewOpen && GlobalStates.overviewShowApps) {
                 GlobalStates.overviewOpen = false;
             } else {
-                GlobalStates.overviewShowApps = false;
+                GlobalStates.overviewShowApps = true;
                 GlobalStates.overviewOpen = true;
             }
         }
@@ -188,10 +188,10 @@ Scope {
         description: "Toggles search on press"
 
         onPressed: {
-            if (GlobalStates.overviewOpen) {
+            if (GlobalStates.overviewOpen && GlobalStates.overviewShowApps) {
                 GlobalStates.overviewOpen = false;
             } else {
-                GlobalStates.overviewShowApps = false;
+                GlobalStates.overviewShowApps = true;
                 GlobalStates.overviewOpen = true;
             }
         }
@@ -230,10 +230,10 @@ Scope {
                 GlobalStates.superReleaseMightTrigger = true;
                 return;
             }
-            if (GlobalStates.overviewOpen) {
+            if (GlobalStates.overviewOpen && GlobalStates.overviewShowApps) {
                 GlobalStates.overviewOpen = false;
             } else {
-                GlobalStates.overviewShowApps = false;
+                GlobalStates.overviewShowApps = true;
                 GlobalStates.overviewOpen = true;
             }
         }

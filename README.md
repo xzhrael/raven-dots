@@ -73,6 +73,8 @@
 
   | Keybind | Action |
   | :--- | :--- |
+  | `Super` | Toggle app drawer (application grid) |
+  | `Super` + `Tab` | Toggle workspaces overview (10 workspaces) |
   | `Super` + `Return` | Terminal (`kitty`) |
   | `Super` + `E` | File manager (`nautilus`) |
   | `Super` + `B` | Web browser |
@@ -80,7 +82,6 @@
   | `Super` + `Q` | Close focused window |
   | `Super` + `Space` | Toggle window tiling / floating |
   | `Super` + `N` | Right sidebar & quick settings |
-  | `Super` + `Tab` | Workspaces overview |
   | `Ctrl` + `Super` + `T` | Regenerate dynamic palette (Matugen) |
   | `Super` + `/` | Complete keybind cheatsheet |
 
