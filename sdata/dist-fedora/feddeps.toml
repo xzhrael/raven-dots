@@ -41,6 +41,7 @@ packages = [
   "wget2",
   "ripgrep",
   "jq",
+  "fastfetch",
   "xdg-utils",
   "rsync",
   "yq"
