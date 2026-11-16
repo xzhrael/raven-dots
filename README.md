@@ -1,54 +1,75 @@
 # 🦅 raven-dots
 
-> **raven-dots** is a tailored, ultra-fast, and minimalist Wayland desktop setup for **Hyprland**, featuring Material You dynamic theming, custom window aesthetics, and a 3D Coverflow wallpaper picker.
-> 
-> *Architected for speed, clean aesthetics, and effortless portability across Linux distributions.*
+<p align="center">
+  <b>A sleek, high-performance, and minimalist Hyprland desktop environment.</b><br>
+  <i>Tailored for speed, sharp geometric aesthetics, dynamic Material You theming, and seamless workflow.</i>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Hyprland-Wayland-00c853?style=for-the-badge&logo=hyprland&logoColor=white" alt="Hyprland" />
+  <img src="https://img.shields.io/badge/Shell-Quickshell-7c4dff?style=for-the-badge" alt="Quickshell" />
+  <img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=for-the-badge" alt="License: GPL-3.0" />
+</p>
 
 ---
 
-## ✨ Features & Visual Highlights
+## 🌟 Overview
 
-- **Window Aesthetics**:
-  - **Sharp 90° Geometry**: Pure squared window corners (`rounding = 0`) for a clean, professional aesthetic.
-  - **Calibrated Transparency**: `95%` active opacity, `88%` inactive opacity, with full `100%` solid fullscreen windows (YouTube, Netflix, etc. remain completely opaque).
-  - **Refined Blur**: Ultra-low latency dual-pass blur (`size = 3, passes = 2`) preventing GPU strain while keeping background text readable.
-  - **Subtle Inactive Window Dimming**: Gentle `0.08` dim strength.
-- **3D Coverflow Wallpaper Picker (`Super + W`)**:
-  - Single-instance toggle (`Super + W` to open, `Super + W` or `Esc` to close).
-  - High-performance Coverflow carousel with mouse scroll wheel support, single-click glide, and double-click apply.
-  - Square solid-color filter bar (Dark, Light, Red, Orange, Yellow, Green, Blue, Purple, Pink, All) with instant active checkmark.
-- **Global Dark / Light Mode Synchronization**:
-  - One-click dark/light mode toggle from the status bar.
-  - Seamlessly syncs GNOME GSettings, DConf, GTK-3.0 (`settings.ini`), GTK-4.0 Libadwaita, Flatpak sandbox environments, and FreeDesktop Portals.
-- **Modular Arch / Extensible Structure**:
-  - Built cleanly on top of the robust `illogical-impulse` Quickshell engine.
-  - All user custom overrides are isolated cleanly in `dots/.config/hypr/custom/` to guarantee smooth, conflict-free updates.
+**raven-dots** is a complete, standalone Wayland desktop suite engineered for users who value razor-sharp window geometry, low-latency rendering, distraction-free productivity, and dynamic color harmony.
+
+Every component has been refined to eliminate visual clutter, reduce resource overhead, and deliver an intuitive, out-of-the-box experience on any Linux distribution.
 
 ---
 
-## 🚀 Installation
+## ✨ Key Features & Aesthetic Pillars
 
-### 1. Fresh Installation on New Linux Distro
+### 🔲 Sharp Geometric Window Styling
+- **Pure 90° Squared Windows**: Zero rounded borders (`rounding = 0`) creating a sharp, modern workstation feel.
+- **Tuned Opacity Profile**: `95%` active window opacity for crystal focus, `88%` inactive opacity for depth perception.
+- **True Opaque Fullscreen**: Video players, YouTube, Netflix, and fullscreen apps automatically stay `100%` solid without dimming or transparency leakage.
+- **Efficient Dual-Pass Blur**: Calibrated low-radius blur (`size = 3, passes = 2`) designed to conserve GPU cycles while keeping underlying desktop context legible.
+- **Subtle Inactive Window Dimming**: Soft `0.08` dimming to keep your eyes focused on the primary task.
 
-Clone your repository and execute the built-in installer:
+### 🖼️ 3D Coverflow Wallpaper Selector (`Super + W`)
+- **Single-Instance Toggle**: Tap <kbd>Super</kbd> + <kbd>W</kbd> to open; tap <kbd>Super</kbd> + <kbd>W</kbd> or <kbd>Esc</kbd> to close. Never spawns duplicate windows.
+- **Smooth Navigation**: High-FPS carousel navigation with native mouse wheel scroll accumulator, single-click card glide, and double-click immediate wallpaper activation.
+- **Square Color Filter Bar**: Solid-color square swatches with high-contrast outlines for Dark, Light, Red, Orange, Yellow, Green, Blue, Purple, and Pink collections.
+- **Active Selection**: Instant checkmark (`✓`) feedback on the active color swatch, with toggle-to-reset back to all wallpapers.
+
+### 🌓 Universal Dark / Light Mode Engine (`sync-theme.sh`)
+- Instant one-click toggle from the desktop status bar.
+- **100% Synchronized Across All Toolkits**:
+  - **GNOME GSettings & DConf**: Dynamically sets `prefer-dark` vs `prefer-light` and `adw-gtk3-dark` vs `adw-gtk3`.
+  - **GTK3 & GTK4 Configuration**: Updates `~/.config/gtk-3.0/settings.ini` and `~/.config/gtk-4.0/settings.ini` in real time.
+  - **Flatpak Sandbox Integration**: Automatically broadcasts theme environments to isolated Flatpak apps.
+  - **XDG Desktop Portal**: Live portal notification ensuring browsers (Firefox, Chrome, Brave) and Electron apps (VS Code, Discord, Obsidian) follow the desktop mode instantly.
+
+---
+
+## 🚀 Quickstart & Installation
+
+### Fresh System Installation
+
+Clone **raven-dots** and run the automated installer:
 
 ```bash
-# Clone raven-dots
+# 1. Clone the repository
 git clone https://github.com/xzhrael/raven-dots.git ~/raven-dots
 cd ~/raven-dots
 
-# Run setup
+# 2. Run the automated setup installer
 ./setup install
 ```
 
-The `./setup install` script will automatically:
-1. Install all necessary dependencies for your distribution (Arch, Fedora, Gentoo, etc.).
-2. Set up systemd user services, permissions, and environments.
-3. Deploy all configuration files cleanly to `~/.config/` and `~/.local/share/`.
+The installer handles:
+1. Detecting your distribution package manager (Arch, Fedora, openSUSE, Gentoo, etc.).
+2. Installing essential Wayland, Hyprland, audio, and Quickshell dependencies.
+3. Deploying configurations cleanly to your system.
+4. Setting up required environment variables and services.
 
-### 2. Updating raven-dots
+### Updating raven-dots
 
-To pull your latest configs and apply them:
+To sync and update your configuration files in-place:
 
 ```bash
 cd ~/raven-dots
@@ -58,23 +79,24 @@ git pull
 
 ---
 
-## ⌨️ Essential Keybindings
+## ⌨️ Essential Shortcuts
 
-| Keybind | Action |
+| Shortcut | Description |
 | :--- | :--- |
-| <kbd>Super</kbd> + <kbd>Return</kbd> | Open Terminal (`kitty`) |
-| <kbd>Super</kbd> + <kbd>E</kbd> | Open File Manager (`nautilus`) |
-| <kbd>Super</kbd> + <kbd>B</kbd> | Open Web Browser (`helium` / `brave`) |
+| <kbd>Super</kbd> + <kbd>Return</kbd> | Launch Terminal (`kitty`) |
+| <kbd>Super</kbd> + <kbd>E</kbd> | Launch File Manager (`nautilus`) |
+| <kbd>Super</kbd> + <kbd>B</kbd> | Launch Web Browser |
 | <kbd>Super</kbd> + <kbd>W</kbd> | **Toggle 3D Coverflow Wallpaper Selector** |
-| <kbd>Super</kbd> + <kbd>Q</kbd> | Close Active Window |
-| <kbd>Super</kbd> + <kbd>Space</kbd> | Toggle Window Floating / Tiling |
-| <kbd>Super</kbd> + <kbd>N</kbd> | Open Right Sidebar / Quick Settings |
-| <kbd>Super</kbd> + <kbd>Tab</kbd> | Toggle Workspaces Overview |
-| <kbd>Ctrl</kbd> + <kbd>Super</kbd> + <kbd>T</kbd> | Regenerate Wallpaper Colors (Matugen) |
+| <kbd>Super</kbd> + <kbd>Q</kbd> | Close Focused Window |
+| <kbd>Super</kbd> + <kbd>Space</kbd> | Toggle Window Tiling / Floating |
+| <kbd>Super</kbd> + <kbd>N</kbd> | Open Right Sidebar & System Controls |
+| <kbd>Super</kbd> + <kbd>Tab</kbd> | Workspaces Overview |
+| <kbd>Ctrl</kbd> + <kbd>Super</kbd> + <kbd>T</kbd> | Refresh Wallpaper Dynamic Palette (Matugen) |
+| <kbd>Super</kbd> + <kbd>/</kbd> | Open Complete Keybinds Cheatsheet |
 
 ---
 
-## 📂 Configuration Layout
+## 📂 Project Architecture
 
 ```text
 raven-dots/
@@ -99,26 +121,10 @@ raven-dots/
 
 ---
 
-## ⚖️ License & Notice of Modification
+## ⚖️ License & Attribution
 
 This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)** - see the [LICENSE](LICENSE) file for details.
 
-### Notice of Modification (GPLv3 §5.a)
-`raven-dots` is a customized fork and derivative work based on [end-4/dots-hyprland (illogical-impulse)](https://github.com/end-4/dots-hyprland), originally developed by **end-4** and community contributors under the GNU GPLv3.
-
-**Key modifications introduced in `raven-dots` (November 2026):**
-- **Window Aesthetics**: Sharp 90° window geometry (`rounding = 0`), adjusted active/inactive window opacity (`0.95` / `0.88`), calibrated low-latency dual-pass blur (`size = 3, passes = 2`), and subtle inactive window dimming.
-- **3D Coverflow Wallpaper Picker**: Integrated and enhanced `hyprquickpaper` 3D carousel with single-instance toggle (`Super + W`), mouse wheel scrolling, double-click application, and square solid-color filters.
-- **Global Theme Synchronization**: Built `sync-theme.sh` engine harmonizing dark/light mode across GSettings, DConf, GTK-3.0, GTK-4.0 Libadwaita, Qt, Flatpak sandboxes, and XDG Desktop Portals.
-- **Rebranding & Portability**: Rebranded configuration metadata and standalone documentation for seamless installation across new Linux distributions via `./setup install`.
-
-All original copyrights, licenses, and author notices are strictly retained and respected in accordance with GPL-3.0.
-
----
-
-## 🙏 Credits & Acknowledgments
-
-- **Base Desktop Shell & Engine**: [end-4/dots-hyprland (illogical-impulse)](https://github.com/end-4/dots-hyprland)
-- **Wallpaper Coverflow Inspiration**: [43PR](https://github.com/43pr)
-- **Wayland Shell Framework**: [outfoxxed/quickshell](https://github.com/outfoxxed/quickshell)
-- **Dynamic Theming**: [InioX/matugen](https://github.com/InioX/matugen)
+> **Upstream Attribution & Foundation:**  
+> `raven-dots` is a customized distribution based on the foundation of [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland) under the GNU GPLv3 license.  
+> Wallpaper Coverflow carousel inspired by [43PR](https://github.com/43pr). Powered by [Quickshell](https://github.com/outfoxxed/quickshell) and [Matugen](https://github.com/InioX/matugen).
