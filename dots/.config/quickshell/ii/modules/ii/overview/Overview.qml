@@ -45,6 +45,7 @@ Scope {
                     searchWidget.disableExpandAnimation();
                     overviewScope.dontAutoCancelSearch = false;
                     GlobalFocusGrab.dismiss();
+                    GlobalStates.overviewShowApps = false;
                 } else {
                     if (!overviewScope.dontAutoCancelSearch) {
                         searchWidget.cancelSearch();
@@ -96,9 +97,21 @@ Scope {
                 anchors.horizontalCenter: parent.horizontalCenter
                 active: GlobalStates.overviewOpen && (Config?.options.overview.enable ?? true)
                 visible: (panelWindow.searchingText == "")
-                sourceComponent: OverviewWidget {
-                    screen: panelWindow.screen
-                }
+                sourceComponent: GlobalStates.overviewShowApps ? appGridComp : overviewComp
+            }
+        }
+
+        Component {
+            id: overviewComp
+            OverviewWidget {
+                screen: panelWindow.screen
+            }
+        }
+
+        Component {
+            id: appGridComp
+            AppGridWidget {
+                screen: panelWindow.screen
             }
         }
     }
@@ -127,22 +140,46 @@ Scope {
         target: "search"
 
         function toggle() {
-            GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
+            if (GlobalStates.overviewOpen) {
+                GlobalStates.overviewOpen = false;
+            } else {
+                GlobalStates.overviewShowApps = false;
+                GlobalStates.overviewOpen = true;
+            }
         }
         function workspacesToggle() {
-            GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
+            if (GlobalStates.overviewOpen) {
+                GlobalStates.overviewOpen = false;
+            } else {
+                GlobalStates.overviewShowApps = false;
+                GlobalStates.overviewOpen = true;
+            }
+        }
+        function appDrawerToggle() {
+            if (GlobalStates.overviewOpen && GlobalStates.overviewShowApps) {
+                GlobalStates.overviewOpen = false;
+            } else {
+                GlobalStates.overviewShowApps = true;
+                GlobalStates.overviewOpen = true;
+            }
         }
         function close() {
             GlobalStates.overviewOpen = false;
         }
         function open() {
+            GlobalStates.overviewShowApps = false;
             GlobalStates.overviewOpen = true;
         }
         function toggleReleaseInterrupt() {
             GlobalStates.superReleaseMightTrigger = false;
         }
         function clipboardToggle() {
+            GlobalStates.overviewShowApps = false;
             overviewScope.toggleClipboard();
+        }
+        function emojiToggle() {
+            GlobalStates.overviewShowApps = false;
+            overviewScope.toggleEmojis();
         }
     }
 
@@ -151,7 +188,12 @@ Scope {
         description: "Toggles search on press"
 
         onPressed: {
-            GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
+            if (GlobalStates.overviewOpen) {
+                GlobalStates.overviewOpen = false;
+            } else {
+                GlobalStates.overviewShowApps = false;
+                GlobalStates.overviewOpen = true;
+            }
         }
     }
     GlobalShortcut {
@@ -167,7 +209,12 @@ Scope {
         description: "Toggles overview on press"
 
         onPressed: {
-            GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
+            if (GlobalStates.overviewOpen) {
+                GlobalStates.overviewOpen = false;
+            } else {
+                GlobalStates.overviewShowApps = false;
+                GlobalStates.overviewOpen = true;
+            }
         }
     }
     GlobalShortcut {
@@ -183,7 +230,12 @@ Scope {
                 GlobalStates.superReleaseMightTrigger = true;
                 return;
             }
-            GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
+            if (GlobalStates.overviewOpen) {
+                GlobalStates.overviewOpen = false;
+            } else {
+                GlobalStates.overviewShowApps = false;
+                GlobalStates.overviewOpen = true;
+            }
         }
     }
     GlobalShortcut {

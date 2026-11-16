@@ -53,6 +53,22 @@ Item {
         }
 
         Loader {
+            active: Config.options.bar.utilButtons.showWallpaperSelector
+            visible: Config.options.bar.utilButtons.showWallpaperSelector
+            sourceComponent: CircleUtilButton {
+                Layout.alignment: Qt.AlignVCenter
+                onClicked: Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/quickshell/hyprquickpaper/toggle.sh"])
+                MaterialSymbol {
+                    horizontalAlignment: Qt.AlignHCenter
+                    fill: 0
+                    text: "wallpaper"
+                    iconSize: Appearance.font.pixelSize.large
+                    color: Appearance.colors.colOnLayer2
+                }
+            }
+        }
+
+        Loader {
             active: Config.options.bar.utilButtons.showColorPicker
             visible: Config.options.bar.utilButtons.showColorPicker
             sourceComponent: CircleUtilButton {

@@ -17,13 +17,13 @@ printf "${STY_CYAN}NOTE:
   The old \"./update.sh\"    is now \"./setup exp-update\"
   The old \"./uninstall.sh\" is now \"./setup uninstall\"${STY_RST}
 
-[$0]: Handle setup for illogical-impulse.
+[$0]: Handle setup for raven-dots.
 
 Syntax:
   $0 <subcommand> [OPTIONS]...
 
 Subcommands:
-  install        (Re)Install/Update illogical-impulse.
+  install        (Re)Install/Update raven-dots.
                  Note: To update to the latest, manually run \"git stash && git pull\" first.
   install-deps   Run the install step \"1. Install dependencies\"
   install-setups Run the install step \"2. Setup for permissions/services etc\"

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "display": {
+    "color": {
+      "keys": "{{colors.primary.default.hex}}"
+    },
+    "separator": "  "
+  },
+  "logo": {
+    "source": "~/.config/fastfetch/logo_plain.txt",
+    "type": "file",
+    "color": {
+      "1": "{{colors.primary.default.hex}}"
+    },
+    "padding": {
+      "left": 2,
+      "right": 4,
+      "top": 0
+    }
+  },
+  "modules": [
+    "break",
+    {
+      "color": {
+        "at": "{{colors.outline.default.hex}}",
+        "host": "{{colors.secondary.default.hex}}",
+        "user": "{{colors.primary.default.hex}}"
+      },
+      "type": "title"
+    },
+    "break",
+    {
+      "format": "{2}",
+      "key": " ▫ OS       ",
+      "keyColor": "{{colors.primary.default.hex}}",
+      "type": "os"
+    },
+    {
+      "format": "{release}",
+      "key": " ▫ Kernel   ",
+      "keyColor": "{{colors.secondary.default.hex}}",
+      "type": "kernel"
+    },
+    {
+      "format": "{pretty-name}",
+      "key": " ▫ WM       ",
+      "keyColor": "{{colors.tertiary.default.hex}}",
+      "type": "wm"
+    },
+    {
+      "format": "{pretty-name}",
+      "key": " ▫ Shell    ",
+      "keyColor": "{{colors.primary.default.hex}}",
+      "type": "shell"
+    },
+    {
+      "key": " ▫ Uptime   ",
+      "keyColor": "{{colors.secondary.default.hex}}",
+      "type": "uptime"
+    },
+    {
+      "format": "{used} / {total}",
+      "key": " ▫ Ram      ",
+      "keyColor": "{{colors.tertiary.default.hex}}",
+      "type": "memory"
+    },
+    "break",
+    {
+      "type": "colors",
+      "symbol": "circle"
+    }
+  ]
+}

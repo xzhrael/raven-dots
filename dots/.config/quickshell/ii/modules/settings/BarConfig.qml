@@ -235,6 +235,14 @@ ContentPage {
                     Config.options.bar.utilButtons.showScreenRecord = checked;
                 }
             }
+            ConfigSwitch {
+                buttonIcon: "wallpaper"
+                text: Translation.tr("Wallpaper selector")
+                checked: Config.options.bar.utilButtons.showWallpaperSelector
+                onCheckedChanged: {
+                    Config.options.bar.utilButtons.showWallpaperSelector = checked;
+                }
+            }
         }
     }
 

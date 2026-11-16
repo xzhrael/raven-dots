@@ -1,0 +1,54 @@
+{
+  "panelFamily": "ii",
+  "dock": {
+    "pinnedApps": [
+      "helium",
+      "brave-origin",
+      "com.vscodium.codium",
+      "dev.zed.Zed",
+      "org.telegram.desktop",
+      "com.discordapp.Discord",
+      "kitty",
+      "org.gnome.Nautilus"
+    ]
+  },
+  "language": {
+    "ui": "en_US"
+  },
+  "policies": {
+    "ai": 0,
+    "weeb": 0
+  },
+  "bar": {
+    "cornerStyle": 2
+  },
+  "appearance": {
+    "fakeScreenRounding": 0,
+    "wallpaperTheming": {
+      "enableAppsAndShell": true,
+      "enableQtApps": true,
+      "enableTerminal": true
+    }
+  },
+  "background": {
+    "widgets": {
+      "clock": {
+        "cookie": {
+          "aiStyling": false
+        }
+      }
+    },
+    "parallax": {
+      "enableWorkspace": false,
+      "enableSidebar": false
+    }
+  },
+  "updates": {
+    "enableCheck": false
+  },
+  "light": {
+    "antiFlashbang": {
+      "enable": false
+    }
+  }
+}

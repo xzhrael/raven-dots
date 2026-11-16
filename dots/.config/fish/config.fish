@@ -1,5 +1,14 @@
 # Commands to run in interactive sessions can go here
+# Ensure user local binaries are in PATH
+fish_add_path $HOME/.local/bin
+fish_add_path $HOME/bin
+
 if status is-interactive
+    # Fastfetch on terminal open
+    if type -q fastfetch
+        fastfetch
+    end
+
     # No greeting
     set fish_greeting
 

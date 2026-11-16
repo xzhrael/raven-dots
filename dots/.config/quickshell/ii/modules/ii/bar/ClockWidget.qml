@@ -8,16 +8,17 @@ Item {
     id: root
     property bool borderless: Config.options.bar.borderless
     property bool showDate: Config.options.bar.verbose
-    implicitWidth: rowLayout.implicitWidth
+    implicitWidth: rowLayout.implicitWidth + 16
     implicitHeight: Appearance.sizes.barHeight
 
     RowLayout {
         id: rowLayout
         anchors.centerIn: parent
-        spacing: 4
+        spacing: 8
 
         StyledText {
-            font.pixelSize: Appearance.font.pixelSize.large
+            font.pixelSize: Appearance.font.pixelSize.small
+            font.weight: Font.DemiBold
             color: Appearance.colors.colOnLayer1
             text: DateTime.time
         }
@@ -32,6 +33,7 @@ Item {
         StyledText {
             visible: root.showDate
             font.pixelSize: Appearance.font.pixelSize.small
+            font.weight: Font.Medium
             color: Appearance.colors.colOnLayer1
             text: DateTime.longDate
         }
@@ -41,6 +43,9 @@ Item {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: !Config.options.bar.tooltips.clickToShow
+        onPressed: {
+            GlobalStates.sidebarRightOpen = !GlobalStates.sidebarRightOpen;
+        }
 
         ClockWidgetPopup {
             hoverTarget: mouseArea

@@ -128,7 +128,14 @@ Scope { // Scope
                             DockSeparator {}
                             DockButton {
                                 Layout.fillHeight: true
-                                onClicked: GlobalStates.overviewOpen = !GlobalStates.overviewOpen
+                                onClicked: {
+                                    if (GlobalStates.overviewOpen && GlobalStates.overviewShowApps) {
+                                        GlobalStates.overviewOpen = false;
+                                    } else {
+                                        GlobalStates.overviewShowApps = true;
+                                        GlobalStates.overviewOpen = true;
+                                    }
+                                }
                                 topInset: Appearance.sizes.hyprlandGapsOut + dockRow.padding
                                 bottomInset: Appearance.sizes.hyprlandGapsOut + dockRow.padding
                                 contentItem: MaterialSymbol {
