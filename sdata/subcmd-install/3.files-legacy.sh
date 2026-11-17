@@ -17,6 +17,7 @@ case "${SKIP_MISCCONF}" in
     done
     install_dir "dots/.local/share/konsole" "${XDG_DATA_HOME}"/konsole
     install_dir "dots/.local/share/applications" "${XDG_DATA_HOME}"/applications
+    install_dir "dots/.local/share/flatpak" "${XDG_DATA_HOME}"/flatpak
     ;;
 esac
 

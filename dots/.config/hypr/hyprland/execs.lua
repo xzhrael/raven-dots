@@ -11,6 +11,7 @@ hl.on("hyprland.start", function ()
     hl.exec_cmd("hypridle")
     hl.exec_cmd("dbus-update-activation-environment --all")
     hl.exec_cmd("sleep 1 && dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP") -- Some fix idk
+    hl.exec_cmd("sleep 1 && systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP && systemctl --user start hyprland-session.target")
 
     -- Audio: Native PipeWire / WirePlumber handles audio devices plug & play without EasyEffects
     -- hl.exec_cmd("easyeffects --hide-window --service-mode")
