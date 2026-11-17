@@ -91,16 +91,14 @@ packages = [
 ]
 install_opts = ["--setopt=install_weak_deps=False"]
 
-# KDE
+# KDE / System Utilities
 [groups.kde]
 packages = [
   "bluedevil",
   "gnome-keyring",
   "NetworkManager",
-  "plasma-nm",
   "polkit-kde",
-  "dolphin",
-  "plasma-systemsettings"
+  "dolphin"
 ]
 
 # MicroTeX-git
