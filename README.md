@@ -22,6 +22,7 @@
      
   - **Sharp 90° Geometry**: Pure squared window corners (`rounding = 0`) across all windows for a clean architectural aesthetic.
   - **Floating-First & 8-Zone Drag Snap**: New windows open floating by default; dragging with `Super + LMB` to edges or corners snaps to halves, quarters, or maximized (and unsnaps cleanly when dragged back to center), with live toggles and snap-zone slider in Settings.
+  - **Drag-to-Reorder Dock**: Hold & drag dock icons smoothly to reorder pinned apps (persisted) and running apps (separated cleanly by the dock separator), complete with drag lift and icon shadows.
   - **Calibrated Opacity**: 95% active opacity, 88% inactive opacity for natural visual depth, and automatic 100% solid fullscreen apps (videos, streaming, games).
   - **3D Coverflow Wallpaper Selector**: Single-instance toggle (`Super + W` to open; `Super + W` or `Esc` to close) with mouse wheel glide, double-click application, and square solid-color category chips with active checkmark indicators.
   - **Terminal Suite & Fastfetch**: Built-in `kitty` terminal paired with `fish` shell, custom `starship` prompt (` `), and customized `fastfetch` displaying personalized ASCII art and system telemetry on launch.

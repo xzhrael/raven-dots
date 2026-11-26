@@ -1,16 +1,24 @@
 {
   "panelFamily": "ii",
   "dock": {
+    "enable": true,
+    "height": 60,
+    "hoverRegionHeight": 2,
+    "hoverToReveal": true,
+    "ignoredAppRegexes": [],
+    "monochromeIcons": true,
     "pinnedApps": [
       "helium",
       "brave-origin",
-      "com.vscodium.codium",
+      "herdr-app",
       "dev.zed.Zed",
+      "com.vscodium.codium",
       "org.telegram.desktop",
       "com.discordapp.Discord",
       "kitty",
       "org.gnome.Nautilus"
-    ]
+    ],
+    "pinnedOnStartup": false
   },
   "language": {
     "ui": "en_US"
@@ -50,5 +58,12 @@
     "antiFlashbang": {
       "enable": false
     }
+  },
+  "windows": {
+    "centerTitle": true,
+    "dragCornerPercent": 30,
+    "dragCornerSnap": true,
+    "floatingByDefault": true,
+    "showTitlebar": true
   }
 }
