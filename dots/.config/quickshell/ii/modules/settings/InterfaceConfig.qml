@@ -819,12 +819,12 @@ ContentPage {
                 Quickshell.execDetached(["bash", "-c", `${FileUtils.trimFileProtocol(Directories.config)}/hypr/custom/scripts/toggle_window_mode.sh --floating ${checked ? "true" : "false"}`]);
             }
             StyledToolTip {
-                text: Translation.tr("New application windows open centered & floating instead of auto-tiling immediately")
+                text: Translation.tr("New application windows open centered and floating instead of auto-tiling")
             }
         }
         ConfigSwitch {
             buttonIcon: "view_quilt"
-            text: Translation.tr("Snap to edges & corners on drag (Super + LMB)")
+            text: Translation.tr("Snap and swap windows on drag")
             checked: Config.options.windows.dragCornerSnap
             onCheckedChanged: {
                 if (!Config.ready || Config.options.windows.dragCornerSnap === checked) return;
@@ -832,7 +832,7 @@ ContentPage {
                 Quickshell.execDetached(["bash", "-c", `${FileUtils.trimFileProtocol(Directories.config)}/hypr/custom/scripts/toggle_window_mode.sh --snap ${checked ? "true" : "false"}`]);
             }
             StyledToolTip {
-                text: Translation.tr("Dragging a window with Super + Left Click to screen edges or corners snaps it to halves, quarters, or maximized")
+                text: Translation.tr("Dragging a window by its titlebar or with Super + Left Click snaps to halves, quarters, or maximized, splits corners, and swaps on drop onto another window")
             }
         }
         ConfigSlider {
@@ -853,7 +853,7 @@ ContentPage {
                 }
             }
             StyledToolTip {
-                text: Translation.tr("Size of side & corner snap zones (% of screen) for half and quarter snapping")
+                text: Translation.tr("Size of side and corner snap zones (% of screen)")
             }
         }
     }

@@ -1,6 +1,4 @@
--- MONITOR CONFIG:
--- Laptop screen (eDP-1) on the LEFT (0x0, normal rotation)
--- External monitor (HDMI-A-2) on the RIGHT (1920x0, rotated 180 degrees)
+-- Monitor layout: eDP-1 on the left (0x0), HDMI-A-2 on the right (1920x0, rotated 180 deg).
 hl.monitor({
     output = "eDP-1",
     mode = "preferred",
@@ -22,9 +20,6 @@ hl.monitor({
     scale = 1
 })
 
--- Custom general, decoration, and cursor configurations for Hyprland
--- Overrides defaults from hyprland.general
-
 hl.config({
     general = {
         gaps_in = 4,
@@ -32,16 +27,15 @@ hl.config({
         border_size = 2
     },
     decoration = {
-        -- Window kotak (sudut siku 90 derajat tanpa rounded corners)
+        -- Sharp 90-degree corners.
         rounding = 0,
         rounding_power = 2,
 
-        -- Opacity / Transparansi: aktif 95%, tidak aktif 88%
         active_opacity = 0.95,
         inactive_opacity = 0.88,
         fullscreen_opacity = 1.0,
 
-        -- Blur halus dan ringan (dikurangi agar jernih dan hemat daya/GPU)
+        -- Light blur keeps text crisp while reducing GPU power draw.
         blur = {
             enabled = true,
             xray = false,
@@ -54,7 +48,6 @@ hl.config({
             popups = true
         },
 
-        -- Bayangan efisien
         shadow = {
             enabled = true,
             range = 15,
@@ -62,13 +55,13 @@ hl.config({
             color = "rgba(00000025)"
         },
 
-        -- Dim inactive dinaikkan keterangannya (dim_strength lebih ringan di 0.08 agar tidak terlalu gelap)
+        -- Mild dimming keeps unfocused windows legible.
         dim_inactive = true,
         dim_strength = 0.08,
         dim_special = 0.2
     },
     cursor = {
-        -- Mengatasi kursor glitch & macet sebelum ujung kanan pada multi-GPU & layar dirotasi 180 derajat
+        -- Software cursor avoids glitches and right-edge stalls on multi-GPU 180-deg rotated displays.
         no_hardware_cursors = true
     }
 })

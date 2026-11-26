@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
-"""
-8-zone Windows-style Aero Snap, Window Drop-Swap & Z-Order helper for Hyprland (0.57+ Lua API).
-Features:
-- Works seamlessly both with SUPER + Left Click AND native CSD titlebar dragging (e.g. Chrome/GTK) without holding SUPER
-- 8-zone corner/edge snapping with configurable corner ratio & automatic unsnap restore
-- Drop-to-swap: dragging a floating or snapped window onto another open window swaps their slots cleanly
-- Enforces floating windows always on top of auto-snapped/maximized windows via `raven_snapped` tag & alterzorder
-- Multi-monitor seam guard & automatic workspace ownership enforcement
-"""
+"""8-zone Aero Snap, drop-to-swap, and floating z-order daemon for Hyprland."""
 
 import json
 import os
@@ -478,10 +470,7 @@ def enforce_floating_above_snapped_cmds(
     workspace_ids: set[int],
     override_snapped: dict[str, bool] | None = None,
 ) -> list[str]:
-    """
-    Push snapped windows cleanly to bottom of the floating z-stack on affected workspaces
-    so unsnapped floating windows always remain above snapped/maximized windows.
-    """
+    """Keep snapped windows below unsnapped floating windows on affected workspaces."""
     override_snapped = override_snapped or {}
     cmds = []
     mon_wa_cache: dict[int, dict] = {}
@@ -516,8 +505,7 @@ def enforce_floating_above_snapped_cmds(
         if not floating_wins or not snapped_wins:
             continue
 
-        # Push most recently focused snapped first, oldest last -> oldest ends up lowest,
-        # preserving snapped relative order while keeping every floating window on top.
+        # Push newest snapped first so oldest sits lowest while floating windows stay on top.
         snapped_wins.sort(key=lambda w: w.get("focusHistoryID", 999))
         for sw in snapped_wins:
             cmds.append(f"dispatch hl.dsp.window.alter_zorder({{ mode = 'bottom', window = 'address:{sw['address']}' }})")
@@ -537,12 +525,7 @@ def find_swap_target(
     state: dict,
     target_zone: str | None,
 ) -> dict | None:
-    """
-    Find an open non-maximized window to swap slots with when dropping a dragged window.
-    - When dropped in an edge/corner zone (excluding maximize), swaps with a window occupying that slot.
-    - When dropped outside snap zones onto another window, swaps with the topmost visible window
-      at the drop point provided the drag started outside that window.
-    """
+    """Find a non-maximized window under the drop point to swap slots with."""
     if target_zone == "maximize":
         return None
 
@@ -811,17 +794,11 @@ def handle_drag_release(
 
 
 def snapshot_drag_start(sx: int, sy: int, fds: list[int]) -> tuple[dict | None, bool]:
-    """
-    Capture pre-drag geometry of the clicked window.
-    If pointer pressed over an unfocused background window, briefly wait (~18 ms)
-    for Hyprland to switch focus while watching for early release.
-    Returns (snapshot_or_None, already_released_bool).
-    """
+    """Capture clicked window geometry; waits up to 18 ms if background click needs focus switch."""
     win = hyprctl_json("activewindow")
     if win and win.get("address") and point_in_rect(sx, sy, rect_of(win)):
         pass
     else:
-        # Wait up to 18ms for focus switch without missing fast button-up events
         deadline = time.monotonic() + 0.018
         while True:
             rem = deadline - time.monotonic()
@@ -874,7 +851,6 @@ def sync_initial_tags_and_zorder():
     workspaces: set[int] = set()
     alive_addrs = {c.get("address") for c in clients if c.get("address")}
 
-    # Prune closed windows from snap state
     stale = [k for k in state if k not in alive_addrs]
     if stale:
         for k in stale:
@@ -894,10 +870,7 @@ def sync_initial_tags_and_zorder():
 
 
 def run_daemon():
-    """
-    Persistent low-overhead input watcher supporting BOTH SUPER+LMB AND direct CSD titlebar
-    drags (like Chrome/GTK/Qt) without holding SUPER.
-    """
+    """Monitor BTN_LEFT via evdev for SUPER+LMB and direct CSD titlebar drags."""
     acquire_single_instance()
     sync_initial_tags_and_zorder()
 

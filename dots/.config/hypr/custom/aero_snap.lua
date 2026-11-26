@@ -44,8 +44,7 @@ local function keep_floating_above_snapped(ws)
     if floating_count == 0 or #snapped == 0 then return end
 
     enforcing_zorder = true
-    -- Push most recently focused snapped first and oldest last so relative snapped order stays intact
-    -- while every unsnapped floating window remains strictly on top.
+    -- Push newest snapped first so oldest sits lowest and floating stays on top.
     table.sort(snapped, function(a, b)
         return (a.focus_history_id or 0) < (b.focus_history_id or 0)
     end)

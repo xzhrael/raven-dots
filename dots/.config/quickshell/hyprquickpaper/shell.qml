@@ -239,7 +239,7 @@ PanelWindow {
     }
     // -----------------------------------------------------------------------
 
-    // ---- Open / close animation (identical curve & timing both ways) ------
+    // Identical open/close animation timing both ways
     property bool isOpen: false
     property bool isClosing: false
     property int animDurationMs: 240
@@ -283,7 +283,6 @@ PanelWindow {
             main.closePicker()
         }
     }
-    // -----------------------------------------------------------------------
 
     property bool showEmpty: false
     readonly property bool looksEmpty: wallpaperPath !== ""
@@ -474,7 +473,6 @@ PanelWindow {
         onWheel: wheel => list.wheelScroll(wheel)
     }
 
-    // Active Wallpaper Name and Navigation Hint at top
     Column {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
@@ -930,7 +928,6 @@ PanelWindow {
         }
     }
 
-    // Bottom Color Category Filter Bar (Kotak Tajam, Kontras Tinggi & Tanpa Teks di Chip)
     Rectangle {
         id: colorFilterBar
         property real settingsDim: main.settingsOpen ? 0.3 : 1.0
@@ -980,7 +977,7 @@ PanelWindow {
                     color: modelData.color
                     opacity: chipCount === 0 ? 0.35 : 1.0
 
-                    // Dynamic border: high contrast so dark & light tiles never vanish
+                    // High-contrast border so dark and light swatches stay visible.
                     border.width: isSelected ? 3 : (chipMouse.containsMouse ? 2 : 1)
                     border.color: {
                         if (isSelected) return (modelData.id === "light" || modelData.id === "yellow") ? "#000000" : "#ffffff";
@@ -996,7 +993,6 @@ PanelWindow {
                     Behavior on border.width { NumberAnimation { duration: 150 } }
                     Behavior on opacity { NumberAnimation { duration: 150 } }
 
-                    // Selected Checkmark Indicator: Crystal clear, unmistakable
                     Text {
                         anchors.centerIn: parent
                         text: "✓"
@@ -1006,7 +1002,6 @@ PanelWindow {
                         visible: chipDelegate.isSelected
                     }
 
-                    // Active indicator notch underneath
                     Rectangle {
                         anchors.top: parent.bottom
                         anchors.topMargin: 4 * main.ui

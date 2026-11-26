@@ -1,14 +1,10 @@
--- Custom Window Rules
 if is_file_exists(HOME .. "/.config/hypr/custom/floating_mode.lua") then
     require("custom.floating_mode")
 end
 
--- Enable blur on regular application windows
 hl.window_rule({match = {class = ".*"}, no_blur = false})
 
--- Fullscreen protection rules: no dimming, completely opaque
+-- Keep fullscreen and video windows opaque and undimmed during playback.
 hl.window_rule({match = {fullscreen = 1}, no_dim = true, opaque = true})
-
--- Media player & browser video protections (YouTube/Netflix/MPV/VLC)
 hl.window_rule({match = {class = "^(mpv|vlc)$"}, no_dim = true, opaque = true})
 hl.window_rule({match = {title = ".*(YouTube|Netflix|Twitch|Prime Video).*"}, no_dim = true})

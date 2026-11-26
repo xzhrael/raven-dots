@@ -390,7 +390,6 @@ main() {
         esac
     done
 
-    # Ensure output directories exist before matugen writes
     mkdir -p "$CACHE_DIR/user/generated" "$STATE_DIR/user/generated"
 
     # If accentColor is set in config, use it

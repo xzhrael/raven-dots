@@ -1,6 +1,6 @@
 <div align="center">
     <h1>【 raven-dots 】</h1>
-    <h3>A sharp geometric & dynamic Wayland desktop for Hyprland</h3>
+    <h3>Hyprland dotfiles with squared windows, Material You theming, and a 3D wallpaper picker</h3>
 </div>
 
 <div align="center">
@@ -11,22 +11,21 @@
 <details open> 
   <summary>What this is/isn't</summary>
 
-  - **Technically**: Personal Wayland dotfiles configured for Hyprland.
-  - **Realistically**: A daily-driver desktop environment focused on sharp 90° geometry, dynamic Material You color schemes, an interactive 3D Coverflow wallpaper selector, and a fully synced terminal environment.
-  - **NOT a base system installer**: You still need working graphics drivers, audio stack, and a base Linux installation before running setup.
+  - Personal Wayland dotfiles built around Hyprland and Quickshell.
+  - Focuses on squared 90° window geometry, Material You colors synced across GTK, Qt, and terminals, and floating-first window management.
+  - Not a base OS installer: install your graphics drivers, audio stack, and base Linux system before running setup.
   
 </details>
 
 <details open> 
   <summary>Notable features</summary>
      
-  - **Sharp 90° Geometry**: Pure squared window corners (`rounding = 0`) across all windows for a clean architectural aesthetic.
-  - **Floating-First & 8-Zone Drag Snap**: New windows open floating by default; dragging with `Super + LMB` to edges or corners snaps to halves, quarters, or maximized (and unsnaps cleanly when dragged back to center), with live toggles and snap-zone slider in Settings.
-  - **Drag-to-Reorder Dock**: Hold & drag dock icons smoothly to reorder pinned apps (persisted) and running apps (separated cleanly by the dock separator), complete with drag lift and icon shadows.
-  - **Calibrated Opacity**: 95% active opacity, 88% inactive opacity for natural visual depth, and automatic 100% solid fullscreen apps (videos, streaming, games).
-  - **3D Coverflow Wallpaper Selector**: Single-instance toggle (`Super + W` to open; `Super + W` or `Esc` to close) with mouse wheel glide, double-click application, and square solid-color category chips with active checkmark indicators.
-  - **Terminal Suite & Fastfetch**: Built-in `kitty` terminal paired with `fish` shell, custom `starship` prompt (` `), and customized `fastfetch` displaying personalized ASCII art and system telemetry on launch.
-  - **Universal Dark/Light Sync**: Status bar toggle that instantly synchronizes GNOME GSettings, DConf, GTK-3, GTK-4 Libadwaita, Flatpak sandboxes, and XDG Desktop Portals.
+  - Squared 90° window corners (`rounding = 0`), 95% active and 88% inactive opacity, and opaque undimmed fullscreen playback for video players and browsers.
+  - New windows open floating and centered by default; dragging any window by its titlebar or with `Super + LMB` snaps to halves, quarters, or maximized, shrinks covered 50% sides into corners, swaps slots when dropped onto another window, and keeps floating windows above snapped ones.
+  - Hold and drag dock icons to reorder pinned apps or running windows on either side of the separator, with persisted pinned order.
+  - 3D coverflow wallpaper picker (`Super + W` to toggle, scroll wheel to browse, double-click or `Enter` to apply) with color filters and crossfaded wallpaper and palette updates.
+  - Bundled `kitty`, `fish`, `starship` (` `), and `fastfetch` config that reloads Material You terminal colors on theme changes.
+  - Dark and light mode toggle that updates GNOME GSettings, DConf, GTK 3/4, Flatpak overrides, and `xdg-desktop-portal`.
 </details>
 
 <div align="center">
@@ -80,11 +79,12 @@
   | `Super` + `Return` | Terminal (`kitty`) |
   | `Super` + `E` | File manager (`nautilus`) |
   | `Super` + `B` | Web browser |
-  | `Super` + `W` | **Toggle 3D Coverflow Wallpaper Picker** |
+  | `Super` + `W` | Toggle 3D coverflow wallpaper picker |
   | `Super` + `Q` | Close focused window |
-  | `Super` + `Space` | Toggle window tiling / floating |
+  | `Super` + `Alt` + `Space` | Toggle window floating/tiling |
   | `Super` + `N` | Right sidebar & quick settings |
-  | `Ctrl` + `Super` + `T` | Regenerate dynamic palette (Matugen) |
+  | `Ctrl` + `Super` + `T` | Open 3D coverflow wallpaper picker |
+  | `Ctrl` + `Super` + `Shift` + `D` | Toggle dark/light mode |
   | `Super` + `/` | Complete keybind cheatsheet |
 
 </details>
