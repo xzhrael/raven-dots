@@ -34,6 +34,14 @@ Singleton {
     property real backgroundTransparency: Config?.options.appearance.transparency.enable ? Config?.options.appearance.transparency.automatic ? autoBackgroundTransparency : Config?.options.appearance.transparency.backgroundTransparency : 0
     property real contentTransparency: Config?.options.appearance.transparency.automatic ? autoContentTransparency : Config?.options.appearance.transparency.contentTransparency
 
+    Behavior on backgroundTransparency {
+        NumberAnimation {
+            duration: 340
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.animationCurves.expressiveEffects
+        }
+    }
+
     m3colors: QtObject {
         property bool darkmode: true
         property bool transparent: false

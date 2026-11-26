@@ -163,6 +163,7 @@ hl.layer_rule({ match = { namespace = "quickshell:sidebarLeft" }, animation = "s
 hl.layer_rule({ match = { namespace = "quickshell:verticalBar" }, animation = "slide"})
 hl.layer_rule({ match = { namespace = "quickshell:osk" }, order = -1})
 -- Quickshell: waffles
+hl.layer_rule({ match = { namespace = "wallpaper-picker" }, no_anim = true})
 hl.layer_rule({ match = { namespace = "quickshell:wallpaperSelector" }, animation = "slide top"})
 hl.layer_rule({ match = { namespace = "quickshell:wNotificationCenter" }, no_anim = true})
 hl.layer_rule({ match = { namespace = "quickshell:wOnScreenDisplay" }, no_anim = true})

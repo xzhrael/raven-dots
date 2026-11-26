@@ -239,27 +239,49 @@ PanelWindow {
     }
     // -----------------------------------------------------------------------
 
-    // ---- Launch animation -------------------------------------------------
-    property int introDuration: 300
-    property real introScale: 0.94
-    property real introRise: 24
-    property real intro: 0
-    property real fade: 0
+    // ---- Open / close animation (identical curve & timing both ways) ------
+    property bool isOpen: false
+    property bool isClosing: false
+    property int animDurationMs: 240
+    property real introScale: 0.95
+    property real introRise: 18
+    property real intro: isOpen ? 1 : 0
+    property real fade: isOpen ? 1 : 0
 
-    NumberAnimation on intro {
-        from: 0
-        to: 1
-        duration: main.introDuration
-        easing.type: Easing.OutCubic
-        running: true
+    Behavior on intro {
+        NumberAnimation {
+            duration: main.animDurationMs
+            easing.type: Easing.InOutCubic
+        }
     }
 
-    NumberAnimation on fade {
-        from: 0
-        to: 1
-        duration: main.introDuration
-        easing.type: Easing.InOutQuad
-        running: true
+    Behavior on fade {
+        NumberAnimation {
+            duration: main.animDurationMs
+            easing.type: Easing.InOutCubic
+        }
+    }
+
+    function closePicker() {
+        if (isClosing) return
+        isClosing = true
+        settingsOpen = false
+        isOpen = false
+        quitTimer.restart()
+    }
+
+    Timer {
+        id: quitTimer
+        interval: main.animDurationMs + 20
+        repeat: false
+        onTriggered: Qt.quit()
+    }
+
+    IpcHandler {
+        target: "wallpaperPicker"
+        function close(): void {
+            main.closePicker()
+        }
     }
     // -----------------------------------------------------------------------
 
@@ -306,7 +328,7 @@ PanelWindow {
         return item[prop] || ""
     }
 
-    function rebuildFilteredList() {
+    function rebuildFilteredList(forceResetToMiddle = false) {
         if (folderModel.count === 0 && folderModel.status !== FolderListModel.Ready) return
         var res = []
         for (var i = 0; i < folderModel.count; i++) {
@@ -318,11 +340,44 @@ PanelWindow {
                 res.push({ fileName: fn, filePath: fp, category: cat })
             }
         }
-        main.filteredWallpapers = res
-        if (list) {
-            list.userMoved = false
-            list.centerOnStart()
+
+        // Preserve user's scroll position when background classification (wallpaper_colors.json) updates
+        if (!forceResetToMiddle && res.length === main.filteredWallpapers.length) {
+            var same = true
+            for (var j = 0; j < res.length; j++) {
+                if (res[j].filePath !== main.filteredWallpapers[j].filePath) {
+                    same = false
+                    break
+                }
+            }
+            if (same) return
         }
+
+        const prevPath = (!forceResetToMiddle && list && list.userMoved)
+            ? main.getWallpaper(list.scrollIndex, "filePath")
+            : ""
+
+        main.filteredWallpapers = res
+        if (!list) return
+
+        if (prevPath !== "") {
+            var preservedIdx = -1
+            for (var k = 0; k < res.length; k++) {
+                if (res[k].filePath === prevPath) {
+                    preservedIdx = k
+                    break
+                }
+            }
+            if (preservedIdx >= 0) {
+                list.selectedIndex = preservedIdx
+                list.scrollIndex = preservedIdx
+                list.recenter()
+                return
+            }
+        }
+
+        list.userMoved = false
+        list.centerOnStart()
     }
 
     FileView {
@@ -357,9 +412,12 @@ PanelWindow {
     exclusiveZone: 1
     WlrLayershell.namespace: "wallpaper-picker"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+    WlrLayershell.keyboardFocus: main.isClosing ? WlrKeyboardFocus.None : WlrKeyboardFocus.Exclusive
 
-    Component.onCompleted: Quickshell.execDetached(["bash", Quickshell.shellPath("cache.sh"), Quickshell.shellDir])
+    Component.onCompleted: {
+        main.isOpen = true
+        Quickshell.execDetached(["bash", Quickshell.shellPath("cache.sh"), Quickshell.shellDir])
+    }
 
     FileView {
         path: Quickshell.shellPath("config.json")
@@ -390,28 +448,28 @@ PanelWindow {
         }
     }
 
-    // Dark backdrop overlay so wallpaper tiles contrast cleanly over desktop windows
+    // Subtle backdrop scrim so desktop remains visible while keeping coverflow tiles legible
     Rectangle {
         id: backdropDim
         anchors.fill: parent
         z: 0
-        color: "#c8000000"
+        color: "#52000000"
         opacity: main.fade
-        Behavior on opacity { NumberAnimation { duration: 250 } }
     }
 
-    // Click on empty space: close the menu if it is open, otherwise quit.
+    // Click on empty space: close the menu if it is open, otherwise quit with matching animation.
     // Right-click anywhere opens / closes the menu.
     // Wheel anywhere (outside the settings panel) scrolls the wallpapers.
     MouseArea {
         id: outsideClickArea
         anchors.fill: parent
         z: 0
+        enabled: !main.isClosing
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onClicked: mouse => {
             if (mouse.button === Qt.RightButton) main.toggleSettings()
             else if (main.settingsOpen) main.closeSettings()
-            else Qt.quit()
+            else main.closePicker()
         }
         onWheel: wheel => list.wheelScroll(wheel)
     }
@@ -424,6 +482,7 @@ PanelWindow {
         spacing: 8 * main.ui
         z: 10
         opacity: main.fade
+        transform: Translate { y: -(1 - main.intro) * 14 * main.ui }
 
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -530,8 +589,9 @@ PanelWindow {
         orientation: ListView.Horizontal
         spacing: main.baseSpacing * main.uiW
         clip: false
-        cacheBuffer: tileWidth
+        cacheBuffer: tileWidth * 3
         boundsBehavior: Flickable.StopAtBounds
+        onMovementStarted: userMoved = true
 
         // Single-copy model (each wallpaper appears exactly once, no repeating loops)
         readonly property int n: main.filteredWallpapers.length
@@ -571,10 +631,11 @@ PanelWindow {
 
         function centerOnStart() {
             if (n <= 0 || main.tileCount <= 0) return
-            selectedIndex = 0
-            scrollIndex = 0
+            const mid = Math.floor((n - 1) / 2)
+            selectedIndex = mid
+            scrollIndex = mid
             jumping = true
-            contentX = centerX(0)
+            contentX = centerX(mid)
             jumping = false
             ready = true
         }
@@ -596,11 +657,11 @@ PanelWindow {
         }
 
         function activateCurrent() {
-            if (n <= 0) return
+            if (n <= 0 || main.isClosing) return
             Quickshell.execDetached(["bash", Quickshell.shellPath("commands.sh"),
                 main.getWallpaper(scrollIndex, "filePath"),
                 main.transition, String(main.transitionDuration)])
-            Qt.quit()
+            main.closePicker()
         }
 
         function moveSelection(delta, speedMultiplier) {
@@ -858,9 +919,9 @@ PanelWindow {
                 break
             case Qt.Key_W:
             case Qt.Key_Escape:
-                // Escape closes the menu first; a second press quits.
+                // Escape closes the menu first; a second press closes the picker smoothly.
                 if (main.settingsOpen) main.closeSettings()
-                else Qt.quit()
+                else main.closePicker()
                 break
             default:
                 return
@@ -872,19 +933,21 @@ PanelWindow {
     // Bottom Color Category Filter Bar (Kotak Tajam, Kontras Tinggi & Tanpa Teks di Chip)
     Rectangle {
         id: colorFilterBar
+        property real settingsDim: main.settingsOpen ? 0.3 : 1.0
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 28 * main.ui
         z: 30
-        opacity: main.fade * (main.settingsOpen ? 0.3 : 1.0)
+        opacity: main.fade * settingsDim
+        transform: Translate { y: (1 - main.intro) * 16 * main.ui }
         width: Math.max(540 * main.ui, colorChipsRow.childrenRect.width + 36 * main.ui)
         height: 64 * main.ui
         radius: 0
-        color: "#f00e0e13"
-        border.width: 0
-        border.color: "transparent"
+        color: "#cc101016"
+        border.width: 1
+        border.color: "#22ffffff"
 
-        Behavior on opacity { NumberAnimation { duration: 250 } }
+        Behavior on settingsDim { NumberAnimation { duration: 200 } }
 
         Row {
             id: colorChipsRow
@@ -966,7 +1029,7 @@ PanelWindow {
                             } else {
                                 main.activeColorFilter = modelData.id;
                             }
-                            main.rebuildFilteredList();
+                            main.rebuildFilteredList(true);
                         }
                     }
                 }

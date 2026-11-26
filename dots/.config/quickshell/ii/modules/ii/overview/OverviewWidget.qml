@@ -14,6 +14,7 @@ import Quickshell.Hyprland
 Item {
     id: root
     required property var screen
+    property bool captureActive: GlobalStates.overviewOpen
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(screen)
     readonly property var toplevels: ToplevelManager.toplevels
     // Clamp to avoid lock-screen temp workspace (2147483647 - N) leaking into UI
@@ -191,6 +192,7 @@ Item {
                     property var monitor: HyprlandData.monitors.find(m => m.id == monitorId)
                     property var address: `0x${modelData.HyprlandToplevel.address}`
                     toplevel: modelData
+                    captureActive: root.captureActive
                     monitorData: this.monitor
                     scale: root.scale
                     widgetMonitor: HyprlandData.monitors.find(m => m.id == root.monitor.id)

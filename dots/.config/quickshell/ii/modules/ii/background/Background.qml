@@ -96,6 +96,11 @@ Variants {
             bgRoot.updateZoomScale();
             // Clock position gets updated after zoom scale is updated
         }
+        Component.onCompleted: {
+            if (bgRoot.wallpaperPath.length > 0) {
+                bgRoot.updateZoomScale();
+            }
+        }
 
         // Wallpaper zoom scale
         function updateZoomScale() {
@@ -127,19 +132,20 @@ Variants {
         Item {
             anchors.fill: parent
 
-            // Wallpaper
-            StyledImage {
-                id: wallpaper
-                visible: opacity > 0 && !blurLoader.active
-                opacity: (status === Image.Ready && !bgRoot.wallpaperIsVideo) ? 1 : 0
-                cache: false
-                smooth: false
+            // Dual-buffer viewport enables zero-flash crossfades while preserving parallax & blur targets
+            Item {
+                id: wallpaperViewport
+                property int frontSlot: 0
+                property bool hasShownFirst: false
+                readonly property string targetSource: (bgRoot.wallpaperSafetyTriggered || bgRoot.wallpaperIsVideo) ? "" : bgRoot.wallpaperPath
+
+                visible: !blurLoader.active && !bgRoot.wallpaperIsVideo
+                width: bgRoot.scaledWallpaperWidth
+                height: bgRoot.scaledWallpaperHeight
 
                 property int workspaceIndex: (bgRoot.monitor.activeWorkspace?.id ?? 1) - 1
                 property real middleFraction: 0.5
                 property real fraction: {
-                    // 0 - start of the picture
-                    // 1 - end of the picture
                     if (bgRoot.totalWorkspaces <= 1) {
                         return middleFraction;
                     }
@@ -167,21 +173,17 @@ Variants {
 
                 x: {
                     if (bgRoot.screen.width > width) {
-                        // Center the picture
                         return (bgRoot.screen.width - width) / 2;
                     }
-                    return - bgRoot.parallaxTotalPixelsX * usedFractionX;
+                    return -bgRoot.parallaxTotalPixelsX * usedFractionX;
                 }
                 y: {
                     if (bgRoot.screen.height > height) {
-                        // Center the picture
                         return (bgRoot.screen.height - height) / 2;
                     }
-                    return - bgRoot.parallaxTotalPixelsY * usedFractionY;
+                    return -bgRoot.parallaxTotalPixelsY * usedFractionY;
                 }
 
-                source: bgRoot.wallpaperSafetyTriggered ? "" : bgRoot.wallpaperPath
-                fillMode: Image.PreserveAspectCrop
                 Behavior on x {
                     NumberAnimation {
                         duration: 600
@@ -194,14 +196,113 @@ Variants {
                         easing.type: Easing.OutCubic
                     }
                 }
-                width: bgRoot.scaledWallpaperWidth
-                height: bgRoot.scaledWallpaperHeight
+
+                function slotItem(idx) {
+                    return idx === 0 ? wallpaperSlot0 : wallpaperSlot1;
+                }
+
+                function loadNextSource(nextSource) {
+                    if (!nextSource || nextSource.length === 0) {
+                        wallpaperSlot0.requestedSource = "";
+                        wallpaperSlot1.requestedSource = "";
+                        wallpaperSlot0.resetImmediateOpacity(0);
+                        wallpaperSlot1.resetImmediateOpacity(0);
+                        wallpaperSlot0.source = "";
+                        wallpaperSlot1.source = "";
+                        return;
+                    }
+                    const front = slotItem(frontSlot);
+                    const back = slotItem(frontSlot === 0 ? 1 : 0);
+                    if (front.requestedSource === nextSource && front.status === Image.Ready) {
+                        return;
+                    }
+                    // Keep whichever slot is fully opaque underneath during rapid wallpaper switches
+                    const incoming = (!hasShownFirst || front.opacity < 0.99) ? front : back;
+                    incoming.resetImmediateOpacity(0);
+                    incoming.requestedSource = nextSource;
+                    incoming.source = nextSource;
+                    if (incoming.status === Image.Ready) {
+                        incoming.promote();
+                    }
+                }
+
+                onTargetSourceChanged: loadNextSource(targetSource)
+                Component.onCompleted: loadNextSource(targetSource)
+
+                component WallpaperBuffer: Image {
+                    id: buffer
+                    required property int slotIndex
+                    property string requestedSource: ""
+                    anchors.fill: parent
+                    asynchronous: true
+                    retainWhileLoading: true
+                    cache: false
+                    smooth: true
+                    fillMode: Image.PreserveAspectCrop
+                    opacity: 0
+                    sourceSize: {
+                        const dpr = (QsWindow.window as QsWindow)?.devicePixelRatio ?? 1;
+                        return Qt.size(wallpaperViewport.width * dpr, wallpaperViewport.height * dpr);
+                    }
+
+                    function resetImmediateOpacity(val) {
+                        fadeAnimBehavior.enabled = false;
+                        opacity = val;
+                        fadeAnimBehavior.enabled = true;
+                    }
+
+                    function promote() {
+                        const other = wallpaperViewport.slotItem(slotIndex === 0 ? 1 : 0);
+                        z = 1;
+                        other.z = 0;
+                        wallpaperViewport.frontSlot = slotIndex;
+                        if (!wallpaperViewport.hasShownFirst) {
+                            wallpaperViewport.hasShownFirst = true;
+                            resetImmediateOpacity(1);
+                            return;
+                        }
+                        opacity = 1;
+                    }
+
+                    Behavior on opacity {
+                        id: fadeAnimBehavior
+                        NumberAnimation {
+                            duration: 450
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+
+                    onStatusChanged: {
+                        if (status === Image.Ready && requestedSource !== "" && requestedSource === wallpaperViewport.targetSource) {
+                            promote();
+                        }
+                    }
+
+                    onOpacityChanged: {
+                        if (opacity === 1 && wallpaperViewport.frontSlot === slotIndex) {
+                            const other = wallpaperViewport.slotItem(slotIndex === 0 ? 1 : 0);
+                            other.resetImmediateOpacity(0);
+                            other.requestedSource = "";
+                            other.source = "";
+                        }
+                    }
+                }
+
+                WallpaperBuffer {
+                    id: wallpaperSlot0
+                    slotIndex: 0
+                }
+
+                WallpaperBuffer {
+                    id: wallpaperSlot1
+                    slotIndex: 1
+                }
             }
 
             Loader {
                 id: blurLoader
                 active: Config.options.lock.blur.enable && (GlobalStates.screenLocked || scaleAnim.running)
-                anchors.fill: wallpaper
+                anchors.fill: wallpaperViewport
                 scale: GlobalStates.screenLocked ? Config.options.lock.blur.extraZoom : 1
                 Behavior on scale {
                     NumberAnimation {
@@ -212,7 +313,7 @@ Variants {
                     }
                 }
                 sourceComponent: GaussianBlur {
-                    source: wallpaper
+                    source: wallpaperViewport
                     radius: GlobalStates.screenLocked ? Config.options.lock.blur.radius : 0
                     samples: radius * 2 + 1
 
@@ -232,10 +333,10 @@ Variants {
                     var f = Config.options.background.parallax.widgetsFactor;
                     return f / bgRoot.parallaxRation;
                 }
-                readonly property real baseWallpaperOffsetX: (bgRoot.screen.width - wallpaper.width) / 2
-                readonly property real baseWallpaperOffsetY: (bgRoot.screen.height - wallpaper.height) / 2
-                readonly property real wallpaperTotalOffsetX: wallpaper.x - baseWallpaperOffsetX
-                readonly property real wallpaperTotalOffsetY: wallpaper.y - baseWallpaperOffsetY
+                readonly property real baseWallpaperOffsetX: (bgRoot.screen.width - wallpaperViewport.width) / 2
+                readonly property real baseWallpaperOffsetY: (bgRoot.screen.height - wallpaperViewport.height) / 2
+                readonly property real wallpaperTotalOffsetX: wallpaperViewport.x - baseWallpaperOffsetX
+                readonly property real wallpaperTotalOffsetY: wallpaperViewport.y - baseWallpaperOffsetY
                 readonly property bool locked: GlobalStates.screenLocked
                 x: wallpaperTotalOffsetX * parallaxFactor * !locked
                 y: wallpaperTotalOffsetY * parallaxFactor * !locked

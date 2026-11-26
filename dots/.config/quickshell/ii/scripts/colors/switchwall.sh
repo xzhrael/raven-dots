@@ -259,8 +259,6 @@ switch() {
         else
             matugen_args+=(image "$imgpath")
             generate_colors_material_args=(--path "$imgpath")
-            # Update wallpaper path in config
-            set_wallpaper_path "$imgpath"
             remove_restore
         fi
     fi
@@ -288,8 +286,6 @@ switch() {
     generate_colors_material_args+=(--termscheme "$terminalscheme" --blend_bg_fg)
     generate_colors_material_args+=(--cache "$STATE_DIR/user/generated/color.txt")
 
-    pre_process "$mode_flag"
-
     # Check if app and shell theming is enabled in config
     if [ -f "$SHELL_CONFIG_FILE" ]; then
         enable_apps_shell=$(jq -r '.appearance.wallpaperTheming.enableAppsAndShell' "$SHELL_CONFIG_FILE")
@@ -297,10 +293,7 @@ switch() {
             echo "App and shell theming disabled, skipping matugen and color generation"
             return
         fi
-    fi
 
-    # Set harmony and related properties
-    if [ -f "$SHELL_CONFIG_FILE" ]; then
         harmony=$(jq -r '.appearance.wallpaperTheming.terminalGenerationProps.harmony' "$SHELL_CONFIG_FILE")
         harmonize_threshold=$(jq -r '.appearance.wallpaperTheming.terminalGenerationProps.harmonizeThreshold' "$SHELL_CONFIG_FILE")
         term_fg_boost=$(jq -r '.appearance.wallpaperTheming.terminalGenerationProps.termFgBoost' "$SHELL_CONFIG_FILE")
@@ -310,16 +303,20 @@ switch() {
     fi
 
     matugen "${matugen_args[@]}"
-    source "$(eval echo $ILLOGICAL_IMPULSE_VIRTUAL_ENV)/bin/activate"
-    python3 "$SCRIPT_DIR/generate_colors_material.py" "${generate_colors_material_args[@]}" \
-        > "$STATE_DIR"/user/generated/material_colors.scss
-    deactivate
-    "$SCRIPT_DIR"/applycolor.sh
 
-    # Pass screen width, height, and wallpaper path to post_process
-    max_width_desired="$(hyprctl monitors -j | jq '([.[].width] | min)' | xargs)"
-    max_height_desired="$(hyprctl monitors -j | jq '([.[].height] | min)' | xargs)"
-    post_process "$max_width_desired" "$max_height_desired" "$imgpath"
+    # Run heavier desktop/app theming hooks in background so Quickshell receives colors.json immediately
+    (
+        pre_process "$mode_flag"
+        source "$(eval echo $ILLOGICAL_IMPULSE_VIRTUAL_ENV)/bin/activate"
+        python3 "$SCRIPT_DIR/generate_colors_material.py" "${generate_colors_material_args[@]}" \
+            > "$STATE_DIR"/user/generated/material_colors.scss
+        deactivate
+        "$SCRIPT_DIR"/applycolor.sh
+
+        max_width_desired="$(hyprctl monitors -j | jq '([.[].width] | min)' | xargs)"
+        max_height_desired="$(hyprctl monitors -j | jq '([.[].height] | min)' | xargs)"
+        post_process "$max_width_desired" "$max_height_desired" "$imgpath"
+    ) >/dev/null 2>&1 &
 }
 
 main() {
@@ -329,6 +326,7 @@ main() {
     color_flag=""
     color=""
     noswitch_flag=""
+    nosetpath_flag=""
 
     get_type_from_config() {
         jq -r '.appearance.palette.type' "$SHELL_CONFIG_FILE" 2>/dev/null || echo "auto"
@@ -379,6 +377,10 @@ main() {
                 imgpath=$(jq -r '.background.wallpaperPath' "$SHELL_CONFIG_FILE" 2>/dev/null || echo "")
                 shift
                 ;;
+            --nosetpath)
+                nosetpath_flag="1"
+                shift
+                ;;
             *)
                 if [[ -z "$imgpath" ]]; then
                     imgpath="$1"
@@ -387,6 +389,9 @@ main() {
                 ;;
         esac
     done
+
+    # Ensure output directories exist before matugen writes
+    mkdir -p "$CACHE_DIR/user/generated" "$STATE_DIR/user/generated"
 
     # If accentColor is set in config, use it
     config_color="$(get_accent_color_from_config)"
@@ -421,16 +426,47 @@ main() {
     fi
 
     if [[ -n "$imgpath" && -z "$noswitch_flag" ]]; then
-        set_accent_color ""
+        if [[ -z "$nosetpath_flag" ]]; then
+            set_accent_color ""
+        fi
         color_flag=""
         color=""
     fi
 
-    # If type_flag is 'auto', detect scheme type from image (after imgpath is set)
+    # Resolve dark/light variant suffix before persisting wallpaper path
+    local orig_imgpath="$imgpath"
+    if [[ "$mode_flag" == "dark" || "$mode_flag" == "light" ]]; then
+        local imgdir="$(dirname "$imgpath")"
+        local imgbase="$(basename "$imgpath")"
+        local imgname="${imgbase%.*}"
+        local imgext="${imgbase##*.}"
+
+        local stripped_name="${imgname%-dark}"
+        stripped_name="${stripped_name%-light}"
+
+        local new_imgpath="${imgdir}/${stripped_name}-${mode_flag}.${imgext}"
+        local new_stripped_imgpath="${imgdir}/${stripped_name}.${imgext}"
+
+        if [[ -f "$new_imgpath" ]]; then
+            imgpath="$new_imgpath"
+        elif [[ -f "$new_stripped_imgpath" ]]; then
+            imgpath="$new_stripped_imgpath"
+        fi
+    fi
+
+    # Persist non-video wallpaper path immediately so Quickshell starts crossfading before colorgen finishes
+    if [[ -n "$imgpath" && "$color_flag" != "1" ]] && ! is_video "$imgpath"; then
+        if [[ (-z "$nosetpath_flag" && -z "$noswitch_flag") || "$imgpath" != "$orig_imgpath" ]]; then
+            set_wallpaper_path "$imgpath"
+        fi
+    fi
+
+    # Skip expensive OpenCV scheme detection when generating directly from an explicit accent hex color
     if [[ "$type_flag" == "auto" ]]; then
-        if [[ -n "$imgpath" && -f "$imgpath" ]]; then
+        if [[ "$color_flag" == "1" ]]; then
+            type_flag="scheme-tonal-spot"
+        elif [[ -n "$imgpath" && -f "$imgpath" ]]; then
             detected_type="$(detect_scheme_type_from_image "$imgpath")"
-            # Only use detected_type if it's valid
             valid_detected=0
             for t in "${allowed_types[@]}"; do
                 if [[ "$detected_type" == "$t" && "$detected_type" != "auto" ]]; then
@@ -447,30 +483,6 @@ main() {
         else
             echo "[switchwall] Warning: No image to auto-detect scheme from, defaulting to 'scheme-tonal-spot'" >&2
             type_flag="scheme-tonal-spot"
-        fi
-    fi
-
-    # If mode_flag is dark or light, try to find a variant with that mode suffix
-    if [[ "$mode_flag" == "dark" || "$mode_flag" == "light" ]]; then
-        # Get directory, filename without extension, and extension
-        local imgdir="$(dirname "$imgpath")"
-        local imgbase="$(basename "$imgpath")"
-        local imgname="${imgbase%.*}"
-        local imgext="${imgbase##*.}"
-
-        # Strip existing -dark or -light suffix
-        local stripped_name="${imgname%-dark}"
-        stripped_name="${stripped_name%-light}"
-
-        # Construct the new path with the requested mode suffix
-        local new_imgpath="${imgdir}/${stripped_name}-${mode_flag}.${imgext}"
-        local new_stripped_imgpath="${imgdir}/${stripped_name}.${imgext}"
-
-        # If the variant exists, use it
-        if [[ -f "$new_imgpath" ]]; then
-            imgpath="$new_imgpath"
-        elif [[ -f "$new_stripped_imgpath" ]]; then
-            imgpath="$new_stripped_imgpath"
         fi
     fi
 

@@ -41,7 +41,17 @@ Singleton {
 
     function apply(path, darkMode = Appearance.m3colors.darkmode) {
         if (!path || path.length === 0) return;
-        Quickshell.execDetached([Directories.wallpaperSwitchScriptPath, "--mode", darkMode ? "dark" : "light", "--image", path]);
+        const cleanPath = FileUtils.trimFileProtocol(path);
+        const isVideo = /\.(mp4|webm|mkv|avi|mov)$/i.test(cleanPath);
+        if (!isVideo && Config.options?.background) {
+            if (Config.options.appearance?.palette) {
+                Config.options.appearance.palette.accentColor = "";
+            }
+            Config.options.background.wallpaperPath = cleanPath;
+            Quickshell.execDetached([Directories.wallpaperSwitchScriptPath, "--nosetpath", "--mode", darkMode ? "dark" : "light", "--image", cleanPath]);
+        } else {
+            Quickshell.execDetached([Directories.wallpaperSwitchScriptPath, "--mode", darkMode ? "dark" : "light", "--image", cleanPath]);
+        }
         root.changed()
     }
 

@@ -67,10 +67,12 @@ ContentPage {
             Item {
                 implicitWidth: 340
                 implicitHeight: 200
-                
-                StyledImage {
+
+                Image {
                     id: wallpaperPreview
                     anchors.fill: parent
+                    asynchronous: true
+                    retainWhileLoading: true
                     fillMode: Image.PreserveAspectCrop
                     source: Config.options.background.wallpaperPath
                     cache: false

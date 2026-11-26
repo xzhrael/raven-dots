@@ -10,7 +10,9 @@ for pid in $(pidof quickshell 2>/dev/null); do
 done
 
 if [[ -n "$target_pids" ]]; then
-    kill $target_pids 2>/dev/null || true
+    for pid in $target_pids; do
+        qs ipc --pid "$pid" call wallpaperPicker close 2>/dev/null || kill "$pid" 2>/dev/null || true
+    done
     exit 0
 else
     qs -n -p "$HOME/.config/quickshell/hyprquickpaper" &
