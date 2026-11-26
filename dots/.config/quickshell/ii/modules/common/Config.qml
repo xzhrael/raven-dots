@@ -591,6 +591,9 @@ Singleton {
             property JsonObject windows: JsonObject {
                 property bool showTitlebar: true // Client-side decoration for shell apps
                 property bool centerTitle: true
+                property bool floatingByDefault: true
+                property bool dragCornerSnap: true
+                property int dragCornerPercent: 30
             }
 
             property JsonObject hacks: JsonObject {

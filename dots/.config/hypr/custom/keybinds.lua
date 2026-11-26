@@ -2,3 +2,8 @@ hl.bind("CTRL+SUPER+ALT+Slash", hl.dsp.exec_cmd("xdg-open ~/.config/hypr/custom/
 
 -- Wallpaper: Toggle 3D Coverflow HyprQuickPaper (Buka jika tutup, tutup jika sudah buka)
 hl.bind("SUPER + W", hl.dsp.exec_cmd("bash " .. os.getenv("HOME") .. "/.config/quickshell/hyprquickpaper/toggle.sh"), {description = "Wallpaper: Toggle 3D Coverflow picker"} )
+
+-- Aero Snap: 8-zone corner/edge snapping when dragging windows with SUPER + LMB
+if is_file_exists(HOME .. "/.config/hypr/custom/aero_snap.lua") then
+    require("custom.aero_snap")
+end

@@ -1,4 +1,8 @@
 -- Custom Window Rules
+if is_file_exists(HOME .. "/.config/hypr/custom/floating_mode.lua") then
+    require("custom.floating_mode")
+end
+
 -- Enable blur on regular application windows
 hl.window_rule({match = {class = ".*"}, no_blur = false})
 

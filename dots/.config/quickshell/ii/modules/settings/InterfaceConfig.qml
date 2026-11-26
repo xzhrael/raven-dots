@@ -806,6 +806,59 @@ ContentPage {
     }
 
     ContentSection {
+        icon: "window"
+        title: Translation.tr("Window management")
+
+        ConfigSwitch {
+            buttonIcon: "float_landscape_2"
+            text: Translation.tr("Open new windows as floating")
+            checked: Config.options.windows.floatingByDefault
+            onCheckedChanged: {
+                if (!Config.ready || Config.options.windows.floatingByDefault === checked) return;
+                Config.options.windows.floatingByDefault = checked;
+                Quickshell.execDetached(["bash", "-c", `${FileUtils.trimFileProtocol(Directories.config)}/hypr/custom/scripts/toggle_window_mode.sh --floating ${checked ? "true" : "false"}`]);
+            }
+            StyledToolTip {
+                text: Translation.tr("New application windows open centered & floating instead of auto-tiling immediately")
+            }
+        }
+        ConfigSwitch {
+            buttonIcon: "view_quilt"
+            text: Translation.tr("Snap to edges & corners on drag (Super + LMB)")
+            checked: Config.options.windows.dragCornerSnap
+            onCheckedChanged: {
+                if (!Config.ready || Config.options.windows.dragCornerSnap === checked) return;
+                Config.options.windows.dragCornerSnap = checked;
+                Quickshell.execDetached(["bash", "-c", `${FileUtils.trimFileProtocol(Directories.config)}/hypr/custom/scripts/toggle_window_mode.sh --snap ${checked ? "true" : "false"}`]);
+            }
+            StyledToolTip {
+                text: Translation.tr("Dragging a window with Super + Left Click to screen edges or corners snaps it to halves, quarters, or maximized")
+            }
+        }
+        ConfigSlider {
+            enabled: Config.options.windows.dragCornerSnap
+            text: Translation.tr("Snap zone size (%1%)").arg(Math.round(Config.options.windows.dragCornerPercent))
+            buttonIcon: "aspect_ratio"
+            textWidth: 190
+            usePercentTooltip: false
+            from: 5
+            to: 45
+            stopIndicatorValues: [10, 20, 30]
+            value: Config.options.windows.dragCornerPercent
+            onValueChanged: {
+                if (!Config.ready) return;
+                const rounded = Math.round(value);
+                if (Config.options.windows.dragCornerPercent !== rounded) {
+                    Config.options.windows.dragCornerPercent = rounded;
+                }
+            }
+            StyledToolTip {
+                text: Translation.tr("Size of side & corner snap zones (% of screen) for half and quarter snapping")
+            }
+        }
+    }
+
+    ContentSection {
         icon: "wallpaper_slideshow"
         title: Translation.tr("Wallpaper selector")
 
